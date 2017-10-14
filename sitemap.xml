@@ -3,12 +3,34 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://omen-.github.io/about/</loc>
+    <lastmod>2017-10-15T00:53:47+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://omen-.github.io/projects/</loc>
+    <lastmod>2017-10-15T01:08:05+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://omen-.github.io/post/welcome/</loc>
+    <lastmod>2017-10-15T00:58:25+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://omen-.github.io/</loc>
+    <lastmod>2017-10-15T00:58:25+02:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://omen-.github.io/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://omen-.github.io/</loc>
+    <loc>http://omen-.github.io/post/</loc>
+    <lastmod>2017-10-15T00:58:25+02:00</lastmod>
     <priority>0</priority>
   </url>
   
