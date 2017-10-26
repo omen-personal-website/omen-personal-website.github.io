@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Blog on Arthur Bellal</title>
-    <link>http://omen-.github.io/blog/</link>
+    <link>http://arthur.bell.al/blog/</link>
     <description>Recent content in Blog on Arthur Bellal</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 25 Oct 2017 11:43:01 +0200</lastBuildDate>
     
-	<atom:link href="http://omen-.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://arthur.bell.al/blog/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Breaking dofus 1.29.1 maps encryption</title>
-      <link>http://omen-.github.io/blog/breaking-dofus-1.29.1-maps-encryption/</link>
+      <link>http://arthur.bell.al/blog/breaking-dofus-1.29.1-maps-encryption/</link>
       <pubDate>Thu, 26 Oct 2017 11:43:01 +0200</pubDate>
       
-      <guid>http://omen-.github.io/blog/breaking-dofus-1.29.1-maps-encryption/</guid>
+      <guid>http://arthur.bell.al/blog/breaking-dofus-1.29.1-maps-encryption/</guid>
       <description>TL;DR
 A few years ago I found a way to retrieve unknown dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.
 You can find an implementation of the attack described here on my github.

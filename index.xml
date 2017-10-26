@@ -2,30 +2,30 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Arthur Bellal</title>
-    <link>http://omen-.github.io/</link>
+    <link>http://arthur.bell.al/</link>
     <description>Recent content on Arthur Bellal</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 15 Oct 2017 00:53:47 +0200</lastBuildDate>
     
-	<atom:link href="http://omen-.github.io/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://arthur.bell.al/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>About</title>
-      <link>http://omen-.github.io/about/</link>
+      <link>http://arthur.bell.al/about/</link>
       <pubDate>Sun, 15 Oct 2017 00:53:47 +0200</pubDate>
       
-      <guid>http://omen-.github.io/about/</guid>
+      <guid>http://arthur.bell.al/about/</guid>
       <description>Hi there ! My name is Arthur Bellal, a Software Engineer curently located in Paris. I spend most of my free time building things or finding ways to break them apart.</description>
     </item>
     
     <item>
       <title>Breaking dofus 1.29.1 maps encryption</title>
-      <link>http://omen-.github.io/blog/breaking-dofus-1.29.1-maps-encryption/</link>
+      <link>http://arthur.bell.al/blog/breaking-dofus-1.29.1-maps-encryption/</link>
       <pubDate>Thu, 26 Oct 2017 11:43:01 +0200</pubDate>
       
-      <guid>http://omen-.github.io/blog/breaking-dofus-1.29.1-maps-encryption/</guid>
+      <guid>http://arthur.bell.al/blog/breaking-dofus-1.29.1-maps-encryption/</guid>
       <description>TL;DR
 A few years ago I found a way to retrieve unknown dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.
 You can find an implementation of the attack described here on my github.
