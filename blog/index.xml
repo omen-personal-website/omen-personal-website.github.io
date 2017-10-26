@@ -14,11 +14,11 @@
     <item>
       <title>Breaking dofus 1.29.1 maps encryption</title>
       <link>http://omen-.github.io/blog/breaking-dofus-1.29.1-maps-encryption/</link>
-      <pubDate>Wed, 25 Oct 2017 11:43:01 +0200</pubDate>
+      <pubDate>Thu, 26 Oct 2017 11:43:01 +0200</pubDate>
       
       <guid>http://omen-.github.io/blog/breaking-dofus-1.29.1-maps-encryption/</guid>
       <description>TL;DR
-A few years ago I found a way to retrieve unknown dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. This gave me motivation to share my research with the community.
+A few years ago I found a way to retrieve unknown dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.
 You can find an implementation of the attack described here on my github.
 Dofus  Dofus is a Flash-based tactical turn-oriented massively multiplayer online role-playing game (MMORPG) developed and published by Ankama Games, a French computer game manufacturer.</description>
     </item>
