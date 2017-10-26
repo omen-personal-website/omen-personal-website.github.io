@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="author" content="Arthur Bellal">
+<meta name="description" content="TL;DR
+A few years ago I found a way to retrieve unknown dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. This gave me motivation to share my research with the community.
+You can find an implementation of the attack described here on my github.
+Dofus  Dofus is a Flash-based tactical turn-oriented massively multiplayer online role-playing game (MMORPG) developed and published by Ankama Games, a French computer game manufacturer.">
+
+<meta property="og:title" content="Breaking dofus 1.29.1 maps encryption" />
+<meta property="og:description" content="TL;DR
+A few years ago I found a way to retrieve unknown dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. This gave me motivation to share my research with the community.
+You can find an implementation of the attack described here on my github.
+Dofus  Dofus is a Flash-based tactical turn-oriented massively multiplayer online role-playing game (MMORPG) developed and published by Ankama Games, a French computer game manufacturer." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://omen-.github.io/blog/breaking-dofus-1.29.1-maps-encryption/" />
+
+
+
+<meta property="article:published_time" content="2017-10-25T11:43:01&#43;02:00"/>
+<meta property="article:modified_time" content="2017-10-25T11:43:01&#43;02:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+<title>
+
+
+     Breaking dofus 1.29.1 maps encryption 
+
+</title>
+<link rel="canonical" href="http://omen-.github.io/blog/breaking-dofus-1.29.1-maps-encryption/">
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Ubuntu+Mono:400,400i,700,700i|Raleway:500">
+
+
+
+    <link rel="stylesheet" href="/css/reset.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+
+
+<link rel="stylesheet" href="/css/addons.css">
+
+<link rel="shortcut icon"
+
+    href="/img/favicon.ico"
+
+>
+
+
+
+
+</head>
+
+
+<body lang="">
+
+<section class="header">
+    <div class="container">
+        <div class="content">
+            
+            <a href="/"><div class="name">Arthur Bellal</div></a>
+            
+            <nav>
+                <ul>
+                    
+                        <li class="nav-blog"><a href="http://omen-.github.io/blog/"><span>Blog</span></a></li>
+                    
+                        <li class="nav-"><a href="http://omen-.github.io/about/"><span>About</span></a></li>
+                    
+                        <li class="nav-"><a href="http://omen-.github.io/resume.pdf"><span>Resume</span></a></li>
+                    
+                </ul>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<section class="icons">
+    <div class="container">
+        <div class="content">
+
+        
+            <a href="//github.com/omen-" target="_blank" rel="noopener"><img class="icon" src="/img/github.svg" alt="github" /></a>
+        
+
+        
+
+        
+
+        
+            <a href="//linkedin.com/in/arthur-bellal" target="_blank" rel="noopener"><img class="icon" src="/img/linkedin.svg" alt="linkedin" /></a>
+        
+
+        
+
+        
+
+        
+
+        
+            <a href="mailto:arthur@bell.al"><img class="icon" src="/img/email.svg" alt="email" /></a>
+        
+
+       
+        
+        </div>
+    </div>
+</section>
+
+
+<section class="main post non-narrow zero-top-spacing">
+    <div class="container">
+        <div class="content">
+            <div class="front-matter">
+                <div class="title-container">
+                    <div class="page-heading">
+
+    Breaking dofus 1.29.1 maps encryption
+
+</div>
+
+                    <div class="initials"><a href="http://omen-.github.io/"></a></div>
+                </div>
+                <div class="meta">
+                    
+                    <div class="date" title='Wed Oct 25 2017 11:43:01 CEST'>Oct 25, 2017</div>
+                    
+                    
+		    <div class="reading-time"><div class="middot"></div>9 minutes read</div>
+                    
+                </div>
+            </div>
+            <div class="markdown">
+                
+
+<p><strong>TL;DR</strong></p>
+
+<p>A few years ago I found a way to retrieve unknown dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. This gave me motivation to share my research with the community.</p>
+
+<p>You can find an implementation of the attack described here on my <a href="https://github.com/Omen-/dofus-key-finder">github</a>.</p>
+
+<h1 id="dofus">Dofus</h1>
+
+<blockquote>
+<p>Dofus is a Flash-based tactical turn-oriented massively multiplayer online role-playing game (MMORPG) developed and published by Ankama Games, a French computer game manufacturer.</p>
+
+<p>The game has attracted over 25 million players worldwide and is especially well known in France. Today, there are more than 1.5 million subscribers every month on this game.</p>
+</blockquote>
+
+<p><a href="https://en.wikipedia.org/wiki/Dofus">Wikipedia - Dofus</a></p>
+
+<p>In 2010, Ankama Games reveal a major update of dofus, Dofus 2.0, with updated graphics and new content. This new version was not well received by the community and it resulted significant loss in the playerbase.</p>
+
+<p><img src="/images/dofus-maps/dofus2-4.png#center" alt="dofus" />
+<center><em>Dofus 1.29 / 2.0</em> - Copyright © 2017 Ankama Games</center></p>
+
+<p>Similarly to some other games like RuneScape or World of Warcaft, this led to the creation of communities aiming to build <a href="https://en.wikipedia.org/wiki/Server_emulator">server emulators</a> to recreate the original experience.</p>
+
+<h1 id="asset-protection">Asset protection</h1>
+
+<p>To protect some of his assets against data mining and private servers, Ankama Games implemented an encryption algorithm using <a href="https://en.wikipedia.org/wiki/XOR_cipher">XOR cipher</a>. The idea is simple : static assets like maps are stored on the client&rsquo;s computers, encrypted. When the asset is needed the server will send the decryption key to the client.</p>
+
+<p>When the player enters a map, the server sends him the decryption key. The game client uses this key to decrypt the map and then displays it.</p>
+
+<p>This means that to obtain the key for a certain map, you need to be able to access this map. There is no way to cheat this system or it would also be a game-breaking bug that lets you teleport on any map.</p>
+
+<p>If you send the wrong key to the client, the map will not be displayed properly.</p>
+
+<p><img src="/images/dofus-maps/bad-key.png#center" alt="bad key" />
+<center><em>Not quite correct key</em> - Copyright © 2017 Ankama Games</center></p>
+
+<p><img src="/images/dofus-maps/good-key.png#center" alt="good key" />
+<center><em>Correct key</em> - Copyright © 2017 Ankama Games</center></p>
+
+<h1 id="checking-the-xor-cipher-implementation">Checking the XOR cipher implementation</h1>
+
+<p>I will use <code>^</code> to symbolize the <a href="https://en.wikipedia.org/wiki/Exclusive_or">XOR opperator</a>.</p>
+
+<p>Here is the client decryption function (edited to make it more readable) :</p>
+<div class="highlight"><pre class="chroma"><code class="language-as3" data-lang="as3"><span class="s3e8">function</span><span class="s1f40"> </span><span class="sfa0">(</span><span class="s7d0">data</span><span class="sfa0">,</span><span class="s1f40"> </span><span class="s7d0">key</span><span class="sfa0">,</span><span class="s1f40"> </span><span class="s7d0">c</span><span class="sfa0">)</span><span class="s1f40">
+</span><span class="s1f40"></span><span class="sfa0">{</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s7d0">var</span><span class="s1f40"> </span><span class="s7d0">decryptedData</span><span class="s1f40"> </span><span class="sfa0">=</span><span class="s1f40"> </span><span class="s3e8">new</span><span class="s1f40"> </span><span class="s3e8">String</span><span class="s1f40"></span><span class="sfa0">();</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s7d0">var</span><span class="s1f40"> </span><span class="s7d0">i</span><span class="s1f40"> </span><span class="sfa0">=</span><span class="s1f40"> </span><span class="sc80">0</span><span class="sfa0">;</span><span class="s1f40">
+</span><span class="s1f40">        
+</span><span class="s1f40">  </span><span class="s3e8">while</span><span class="s1f40"> </span><span class="sfa0">(</span><span class="s7d0">i</span><span class="s1f40"> </span><span class="sfa0">&lt;</span><span class="s1f40"> </span><span class="s7d0">data</span><span class="sfa0">.</span><span class="s7d1">length</span><span class="sfa0">)</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="sfa0">{</span><span class="s1f40">
+</span><span class="s1f40">    </span><span class="s7d0">decryptedData</span><span class="s1f40"> </span><span class="sfa0">=</span><span class="s1f40"> </span><span class="s7d0">decryptedData</span><span class="s1f40"> </span><span class="sfa0">+</span><span class="s1f40"> </span><span class="sfa0">(</span><span class="s7d0">key</span><span class="sfa0">.</span><span class="s7d1">charCodeAt</span><span class="sfa0">(</span><span class="s7d0">i</span><span class="sfa0">)</span><span class="s1f40"> </span><span class="sfa0">^</span><span class="s1f40"> 
+</span><span class="s1f40">      </span><span class="s7d0">key</span><span class="sfa0">.</span><span class="s7d1">charCodeAt</span><span class="sfa0">((</span><span class="s7d0">i</span><span class="s1f40"> </span><span class="sfa0">+</span><span class="s1f40"> </span><span class="s7d0">c</span><span class="sfa0">)</span><span class="s1f40"> </span><span class="sfa0">%</span><span class="s1f40"> </span><span class="s7d0">key</span><span class="sfa0">.</span><span class="s7d1">length</span><span class="sfa0">));</span><span class="s1f40">
+</span><span class="s1f40">    </span><span class="s7d0">i</span><span class="s1f40"> </span><span class="sfa0">=</span><span class="s1f40"> </span><span class="s7d0">i</span><span class="s1f40"> </span><span class="sfa0">+</span><span class="s1f40"> </span><span class="sc80">1</span><span class="sfa0">;</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="sfa0">}</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s3e8">return</span><span class="s1f40"> </span><span class="s7d0">decryptedData</span><span class="sfa0">;</span><span class="s1f40">
+</span><span class="s1f40"></span><span class="sfa0">}</span></code></pre>
+</div>
+<p>As you may be able to see, this is almost a standard <a href="https://en.wikipedia.org/wiki/XOR_cipher">XOR cipher</a> algorithm. The only difference is the parameter called <code>c</code> wich adds and offset to the key. This is probably an attempt to make the algorithm safer but does nothing in practice. You do not need to understand why to continue with the rest of this post and can just ignore this but it only means that we will need to apply a <a href="https://en.wikipedia.org/wiki/Circular_shift">circular shift</a> on the key before sending it to the client.</p>
+
+<p>The consensus about <a href="https://en.wikipedia.org/wiki/XOR_cipher">XOR cipher</a> is that it can be a strong encryption algorithm if the following conditions are met:</p>
+
+<ul>
+<li>The data and the key are about the same length.</li>
+<li>The key cannot be guessed</li>
+<li>The data cannot be guessed</li>
+</ul>
+
+<p>To make you understand why this is important I will check if our case satisfies each of this points and explain you what we can do with the results.</p>
+
+<p>Note: We have access to all the encrypted data from the client and about 65% of the keys from the server emulators community. This is what allows us to make statistics about keys and decrypted data.</p>
+
+<h3 id="1-the-data-and-the-key-are-about-the-same-length">1. The data and the key are about the same length.</h3>
+
+<p><img src="/images/dofus-maps/edl-distribution.png#center" alt="encryptedData length distribution" />
+<center><em>Encrypted data length distribution</em></center></p>
+
+<p><img src="/images/dofus-maps/kl-distribution.png#center" alt="key length distribution" />
+<center><em>Key length distribution</em></center></p>
+
+<p>As you can see, most of the times the data and the key does not have the same length by one order of magnitude.</p>
+
+<h4 id="why-is-it-important">Why is it important ?</h4>
+
+<p><a href="https://en.wikipedia.org/wiki/Exclusive_or">XOR</a> has an intresting property that make <a href="https://en.wikipedia.org/wiki/XOR_cipher">XOR cipher</a> possible and XOR so usefull in computer science :</p>
+
+<pre><code>a == a ^ b ^ b
+&gt; true
+</code></pre>
+
+<p>This property can be used to prove another property :</p>
+
+<pre><code>xor1 = a ^ c
+xor2 = b ^ c
+xor1 ^ xor2 == a ^ b
+&gt; true
+</code></pre>
+
+<hr />
+
+<p>Since the key length is lower than the data length, it means that during encryption each part (byte) of the key is going to be applied multiple time on the data.</p>
+
+<pre><code>encryptedData[0] = data[0] ^ key[0]
+encryptedData[keyLength] = data[keyLength] ^ key[0]
+</code></pre>
+
+<p>As you can see this correspond to the two first lines of the previous property :</p>
+
+<ul>
+<li><code>encryptedData[0]</code> is <code>xor1</code></li>
+<li><code>encryptedData[keyLength]</code> is <code>xor2</code></li>
+<li><code>data[0]</code> is <code>a</code></li>
+<li><code>data[keyLength]</code> is <code>b</code></li>
+<li><code>key[0]</code> is <code>c</code></li>
+</ul>
+
+<p>Wich means :</p>
+
+<pre><code>encryptedData[0] ^ encryptedData[keyLength] == data[0] ^ data[keyLength]
+&gt; true
+</code></pre>
+
+<p>We can extend this reasoning to a more general case :</p>
+
+<pre><code>encryptedData[x*keyLength + z] ^ encryptedData[y*keyLength + z] == 
+data[x*keyLength + z] ^ data[y*keyLength + z]
+&gt; true
+</code></pre>
+
+<p>This tool is not usefull in itself, but if we can somehow estimate the possible values for <code>data[x*keyLength + z]</code> and <code>data[y*keyLength + z]</code>, we may be able to deduce their real values.</p>
+
+<p><strong>Example :</strong></p>
+
+<p><code>data[0]</code> is equal to one of this values : <code>[25,2,18]</code></p>
+
+<p><code>data[keyLength]</code> is equal to one of this values : <code>[5,13,48]</code></p>
+
+<p><code>encryptedData[0] ^ encryptedData[keyLength]</code> is equal to <code>15</code></p>
+
+<p>We compute all possible values for <code>data[0] ^ data[keyLength]</code> :</p>
+
+<pre><code>25 ^ 5 = 28   25 ^ 13 = 20    25 ^ 48 = 41
+ 2 ^ 5 = 7     2 ^ 13 = 15     2 ^ 48 = 50
+18 ^ 5 = 23   18 ^ 13 = 31    18 ^ 48 = 34
+</code></pre>
+
+<p>Since the only values for <code>data[0]</code> and <code>data[keyLength]</code> able to produce <code>15</code> are <code>2</code> and <code>13</code> we can deduce that it is their real value.</p>
+
+<p>Getting the part of the key used to encrypt <code>encryptedData[0]</code> and <code>encryptedData[keyLength]</code> back is trivial :</p>
+
+<pre><code>key[0] = encryptedData[x*keyLength] ^ 2
+</code></pre>
+
+<p>Or</p>
+
+<pre><code>key[0] = encryptedData[y*keyLength] ^ 13
+</code></pre>
+
+<p>To find <code>key[1]</code> we can then use the same method again on <code>data[1]</code> and <code>data[keyLength+1]</code> and so on.</p>
+
+<h3 id="2-the-key-cannot-be-guessed">2. The key cannot be guessed.</h3>
+
+<p>To check if the key can be guessed we do not have many options :</p>
+
+<ul>
+<li>We do not have the software used to generate the keys and thus can not know wich pseudo-random implementation has been used.</li>
+<li>We have a set of known keys that we can use to find patterns.</li>
+</ul>
+
+<p>By building statistics about the keys I discovered that they only contains values between 32 and 127, wich correspond to displayable ASCII characters. This choice was probably made to allow the key to be copy-pasted.</p>
+
+<h4 id="why-is-it-important-1">Why is it important ?</h4>
+
+<p>This discovery significantly reduces the amount of possible keys. Like for the previous tool, if we can somehow have a set of possible values for <code>data[x]</code>, we may be able to eliminate some of them.</p>
+
+<p><strong>Example :</strong></p>
+
+<p><code>data[0]</code> is equal to one of this values : <code>[25, 40, 140, 166]</code></p>
+
+<p><code>encryptedData[0]</code> is equal to <code>10</code></p>
+
+<p>We compute all possible values for <code>key[0]</code> ( equal to <code>data[0] ^ encryptedData[0]</code>) :</p>
+
+<pre><code>25 ^ 10 = 19
+40 ^ 10 = 34
+140 ^ 10 = 134
+166 ^ 10 = 172
+</code></pre>
+
+<p>To have a <code>data[0]</code> equal to <code>140</code> or to <code>166</code> we would need an invalid key. This proves that <code>data[0]</code> is not equal to any of thoses two values.</p>
+
+<p>⇒</p>
+
+<p><code>data[0]</code> is equal to one of this values : <code>[25, 40]</code></p>
+
+<p>⇒</p>
+
+<p><code>key[0]</code> is equal to one of this values : <code>[19, 34]</code></p>
+
+<h3 id="3-the-data-cannot-be-guessed">3. The data cannot be guessed.</h3>
+
+<p>To answer this hypothesis, we need to understand the format of dofus maps data.</p>
+
+<p>The data is divided in chunks of 10 bytes that each represent one cell. Thoses ten bytes all have a specific role in describing the cell : they inform the game if the cell is walkable, what is it&rsquo;s texture, etc..</p>
+
+<p>Here is an example of the begining of a decrypted map data containing 7 cells :</p>
+
+<pre>
+<code><span style="color:   #a93226">HhfDaaaaaa</span><span style="color:   #9b59b6">HhfDeaaaaa</span><span style="color:#2980b9">HhfDeaaaaa</span><span style="color:#229954">HhfDeaazaa</span><span style="color:#f1c40f">HhfDeaazaa</span><span style="color:  #ba4a00">HhfDeaaaaa<span style="color: #34495e">HhfDeaaaaa</span></code>
+</pre>
+
+<p>It is easy to see that some bytes of the cells tend to have the same values. Here, the first byte is always <code>H</code>.</p>
+
+<p>Thoses observations led me to make statistics for each of theses 10 bytes.</p>
+
+<p><img src="/images/dofus-maps/1bc-distribution.png#center" alt="first byte of cells distribution" />
+<center><em>Distribution of values for the first byte in cells</em></center></p>
+
+<p>As you can see, for the first byte, there is only 6 possibilites, with 3 of them appearing in less than 1% of the cases.</p>
+
+<p>I did the same for the remaining 9 bytes and the number of possibilities ranges from 10 to 63. If you want to take a look at the full statistics, you can do so <a href="/etc/cell_stats.json">here</a>.</p>
+
+<h4 id="why-is-it-important-2">Why is it important ?</h4>
+
+<p>With this discovery, we now have <a href="/etc/cell_stats.json">10 arrays</a> containing the possibles values for each byte of any cell. We will name the array containing theses 10 arrays <code>possibleValuesForCellAtPosition[10][]</code></p>
+
+<p>We could use this to build an array of possible values for each byte of the data of a map.</p>
+
+<p><strong>Example in pseudocode :</strong></p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="s3e8">func</span><span class="s1f40"> </span><span class="s7df">initDecryptedDataPossibilitiesUsingMethod3</span><span class="s1388">(</span><span class="s3e8">int</span><span class="s1f40"> </span><span class="s7df">dataLength</span><span class="s1388">)</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s3e8">byte</span><span class="s1f40"> </span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">[</span><span class="s7df">dataLength</span><span class="s1388">][]</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s3e8">for</span><span class="s1f40"> </span><span class="s7df">i</span><span class="s1f40"> </span><span class="s1388">=</span><span class="s1f40"> </span><span class="sc80">0</span><span class="s1388">;</span><span class="s7df">i</span><span class="s1f40"> </span><span class="s1388">&lt;</span><span class="s1f40"> </span><span class="s7d0">len</span><span class="s1388">(</span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">);</span><span class="s7df">i</span><span class="sfa0">++</span><span class="s1f40">
+</span><span class="s1f40">    </span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">[</span><span class="s7df">i</span><span class="s1388">]</span><span class="s1f40"> </span><span class="s1388">=</span><span class="s1f40"> </span><span class="s7df">possibleValuesForCellAtPosition</span><span class="s1388">[</span><span class="s7df">i</span><span class="s1f40"> </span><span class="sfa0">%</span><span class="s1f40"> </span><span class="sc80">10</span><span class="s1388">]</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s3e8">return</span><span class="s1f40"> </span><span class="s7df">decryptedDataPossibilities</span></code></pre>
+</div>
+<h2 id="building-the-attack">Building the attack</h2>
+
+<p>During our analysis of this XOR cipher implementation, we discovered 3 ways to narrow down the possible values for the decrypted data and therefore the key. The objective is now to merge all of this in an algorithm that will hopefully be able to reduces the possibles values for each part of the key to only one.</p>
+
+<p>Here is my implementation at the highest level in pseudocode :</p>
+
+<p>Note : <code>decryptedDataPossibilities[][]</code> is a 2 dimensional array that contains all the possible decrypted values for the decrypted data. For example <code>decryptedDataPossibilities[0]</code> contains all the possible values for <code>data[0]</code></p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="s3e8">int</span><span class="s1f40"> </span><span class="s7df">dataLength</span><span class="s1f40"> </span><span class="s1388">=</span><span class="s1f40"> </span><span class="s7df">length</span><span class="s1388">(</span><span class="s7df">encryptedData</span><span class="s1388">)</span><span class="s1f40">
+</span><span class="s1f40"></span><span class="s3e8">byte</span><span class="s1f40"> </span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">[</span><span class="s7df">dataLength</span><span class="s1388">][]</span><span class="s1f40">
+</span><span class="s1f40"></span><span class="s3e8">byte</span><span class="s1f40"> </span><span class="s7df">key</span><span class="s1388">[</span><span class="s7df">keyLength</span><span class="s1388">]</span><span class="s1f40">
+</span><span class="s1f40"></span><span class="s7df">decryptedDataPossibilities</span><span class="s1f40"> </span><span class="s1388">=</span><span class="s1f40"> </span><span class="s7df">initDecryptedDataUsingMethod3</span><span class="s1388">(</span><span class="s7df">dataLength</span><span class="s1388">)</span><span class="s1f40">
+</span><span class="s1f40"></span><span class="s7df">eliminateValuesMethod2</span><span class="s1388">(</span><span class="s7df">encryptedData</span><span class="s1388">,</span><span class="s1f40"> </span><span class="s7df">keyLength</span><span class="s1388">,</span><span class="s1f40"> </span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">)</span><span class="s1f40">
+</span><span class="s1f40"></span><span class="s7df">eliminateValuesMethod1</span><span class="s1388">(</span><span class="s7df">encryptedData</span><span class="s1388">,</span><span class="s1f40"> </span><span class="s7df">keyLength</span><span class="s1388">,</span><span class="s1f40"> </span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">)</span><span class="s1f40">
+</span><span class="s1f40">
+</span><span class="s1f40"></span><span class="s3e8">for</span><span class="s1f40"> </span><span class="s7df">i</span><span class="s1f40"> </span><span class="s1388">=</span><span class="s1f40"> </span><span class="sc80">0</span><span class="s1388">;</span><span class="s7df">i</span><span class="s1f40"> </span><span class="s1388">&lt;</span><span class="s1f40"> </span><span class="s7df">length</span><span class="s1388">(</span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">);</span><span class="s7df">i</span><span class="sfa0">++</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s3e8">if</span><span class="s1f40"> </span><span class="s7df">length</span><span class="s1388">(</span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">[</span><span class="s7df">i</span><span class="s1388">])</span><span class="s1f40"> </span><span class="sfa0">==</span><span class="s1f40"> </span><span class="sc80">1</span><span class="s1f40">
+</span><span class="s1f40">    </span><span class="s7df">key</span><span class="s1388">[</span><span class="s7df">i</span><span class="s1f40"> </span><span class="sfa0">%</span><span class="s1f40"> </span><span class="s7df">keyLength</span><span class="s1388">]</span><span class="s1f40"> </span><span class="s1388">=</span><span class="s1f40"> </span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">[</span><span class="s7df">i</span><span class="s1388">][</span><span class="sc80">0</span><span class="s1388">]</span><span class="s1f40"> </span><span class="s1388">^</span><span class="s1f40"> </span><span class="s7df">encryptedData</span><span class="s1388">[</span><span class="s7df">i</span><span class="s1388">]</span><span class="s1f40">
+</span><span class="s1f40">
+</span><span class="s1f40"></span><span class="s3e8">if</span><span class="s1f40"> </span><span class="s7df">noValueIsNullInArray</span><span class="s1388">(</span><span class="s7df">key</span><span class="s1388">)</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s7df">print</span><span class="s1f40"> </span><span class="sc1c">&#34;Found key :&#34;</span><span class="s1f40"> </span><span class="sfa0">+</span><span class="s1f40"> </span><span class="s7df">key</span><span class="s1f40">
+</span><span class="s1f40"></span><span class="s3e8">else</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s7df">print</span><span class="s1f40"> </span><span class="sc1c">&#34;Multiple keys possible try statistical analysis on remaining possibilities&#34;</span></code></pre>
+</div>
+<p>However, as you may have noticed, we do not have the key length. To find it&rsquo;s value we apply the previous algorithm to each known key value (128 - 277) and after we narrowed down the values using the 3 methods we check if <code>decryptedDataPossibilities</code> still contains at least one values at all positions. If it does not, there is no solution for a valid key with this length and we can proceed to the next length.</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="s3e8">int</span><span class="s1f40"> </span><span class="s7df">dataLength</span><span class="s1f40"> </span><span class="s1388">=</span><span class="s1f40"> </span><span class="s7df">length</span><span class="s1388">(</span><span class="s7df">encryptedData</span><span class="s1388">)</span><span class="s1f40">
+</span><span class="s1f40"></span><span class="s3e8">for</span><span class="s1f40"> </span><span class="s7df">keyLength</span><span class="s1f40"> </span><span class="s1388">=</span><span class="s1f40"> </span><span class="sc80">128</span><span class="s1388">;</span><span class="s7df">keyLength</span><span class="s1f40"> </span><span class="sfa0">&lt;=</span><span class="s1f40"> </span><span class="sc80">277</span><span class="s1388">;</span><span class="s7df">keyLength</span><span class="sfa0">++</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s3e8">byte</span><span class="s1f40"> </span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">[</span><span class="s7df">dataLength</span><span class="s1388">][]</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s3e8">byte</span><span class="s1f40"> </span><span class="s7df">key</span><span class="s1388">[</span><span class="s7df">keyLength</span><span class="s1388">]</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s7df">decryptedDataPossibilities</span><span class="s1f40"> </span><span class="s1388">=</span><span class="s1f40"> </span><span class="s7df">initDecryptedDataUsingMethod3</span><span class="s1388">(</span><span class="s7df">dataLength</span><span class="s1388">)</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s7df">eliminateValuesMethod2</span><span class="s1388">(</span><span class="s7df">encryptedData</span><span class="s1388">,</span><span class="s1f40"> </span><span class="s7df">keyLength</span><span class="s1388">,</span><span class="s1f40"> </span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">)</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s7df">eliminateValuesMethod1</span><span class="s1388">(</span><span class="s7df">encryptedData</span><span class="s1388">,</span><span class="s1f40"> </span><span class="s7df">keyLength</span><span class="s1388">,</span><span class="s1f40"> </span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">)</span><span class="s1f40">
+</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s3e8">for</span><span class="s1f40"> </span><span class="s7df">i</span><span class="s1f40"> </span><span class="s1388">=</span><span class="s1f40"> </span><span class="sc80">0</span><span class="s1388">;</span><span class="s7df">i</span><span class="s1f40"> </span><span class="s1388">&lt;</span><span class="s1f40"> </span><span class="s7df">length</span><span class="s1388">(</span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">);</span><span class="s7df">i</span><span class="sfa0">++</span><span class="s1f40">
+</span><span class="s1f40">    </span><span class="s3e8">if</span><span class="s1f40"> </span><span class="s7df">length</span><span class="s1388">(</span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">[</span><span class="s7df">i</span><span class="s1388">])</span><span class="s1f40"> </span><span class="sfa0">==</span><span class="s1f40"> </span><span class="sc80">0</span><span class="s1f40">
+</span><span class="s1f40">      </span><span class="s3e8">continue</span><span class="s1f40">
+</span><span class="s1f40">    </span><span class="s3e8">else</span><span class="s1f40"> </span><span class="s3e8">if</span><span class="s1f40"> </span><span class="s7df">length</span><span class="s1388">(</span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">[</span><span class="s7df">i</span><span class="s1388">])</span><span class="s1f40"> </span><span class="sfa0">==</span><span class="s1f40"> </span><span class="sc80">1</span><span class="s1f40">
+</span><span class="s1f40">      </span><span class="s7df">key</span><span class="s1388">[</span><span class="s7df">i</span><span class="s1f40"> </span><span class="sfa0">%</span><span class="s1f40"> </span><span class="s7df">keyLength</span><span class="s1388">]</span><span class="s1f40"> </span><span class="s1388">=</span><span class="s1f40"> </span><span class="s7df">decryptedDataPossibilities</span><span class="s1388">[</span><span class="s7df">i</span><span class="s1388">][</span><span class="sc80">0</span><span class="s1388">]</span><span class="s1f40"> </span><span class="s1388">^</span><span class="s1f40"> </span><span class="s7df">encryptedData</span><span class="s1388">[</span><span class="s7df">i</span><span class="s1388">]</span><span class="s1f40">
+</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s3e8">if</span><span class="s1f40"> </span><span class="s7df">noValueIsNullInArray</span><span class="s1388">(</span><span class="s7df">key</span><span class="s1388">)</span><span class="s1f40">
+</span><span class="s1f40">    </span><span class="s7df">print</span><span class="s1f40"> </span><span class="sc1c">&#34;Found key :&#34;</span><span class="s1f40"> </span><span class="sfa0">+</span><span class="s1f40"> </span><span class="s7df">key</span><span class="s1f40">
+</span><span class="s1f40">    </span><span class="s3e8">return</span><span class="s1f40"> </span><span class="s7df">key</span><span class="s1f40">
+</span><span class="s1f40">  </span><span class="s3e8">else</span><span class="s1f40">
+</span><span class="s1f40">    </span><span class="s7df">print</span><span class="s1f40"> </span><span class="sc1c">&#34;Multiple keys possible try statistical analysis on remaining possibilities&#34;</span></code></pre>
+</div>
+<p>With this algorithm, it is possible to find the full key of about 60% all maps.</p>
+
+<p>To explain why we can&rsquo;t find all the keys here is an interesting benchmark :</p>
+
+<pre><code>Percentage of the key found for keys with keyLength % 10 equal to
+0: 0.192308 % on average
+1: 99.861222 % on average
+2: 35.013849 % on average
+3: 99.215823 % on average
+4: 33.853928 % on average
+5: 5.542589 % on average
+6: 39.950291 % on average
+7: 96.070707 % on average
+8: 36.983387 % on average
+9: 99.421586 % on average
+</code></pre>
+
+<p>As you can see, the results depends on the length of the key. This is due to the way method 1. works : the more diversity there is in the two array of possibilites we are trying to narrow, the better the result will be. If the keyLength % 10 = 0 it means that we will always use method 1. with two bytes that correspond to the same cell wich means there will be very little diversity in the two array of possibilities.</p>
+
+<p>From there the best way to find the key that are partialy decrypted is to use a statistical approach.</p>
+
+<p>You can find an implementation of this attack on my <a href="https://github.com/Omen-/dofus-key-finder">github</a>.</p>
+
+<p>If you want more details on any part of this attack you can contact me, I will be more than happy to aswer !</p>
+
+                <br>
+		<p><a href="/blog/">Back to posts</a></p>
+            </div>
+            <br>
+            <div class="disqus">
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-108126571-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+</body>
+</html>
+

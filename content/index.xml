@@ -1,24 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Arthur Bellal</title>
-    <link>http://omen-.github.io/</link>
-    <description>Recent content on Arthur Bellal</description>
+    <title>Contents on Arthur Bellal</title>
+    <link>http://omen-.github.io/content/</link>
+    <description>Recent content in Contents on Arthur Bellal</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 15 Oct 2017 00:53:47 +0200</lastBuildDate>
+    <lastBuildDate>Wed, 25 Oct 2017 11:43:01 +0200</lastBuildDate>
     
-	<atom:link href="http://omen-.github.io/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://omen-.github.io/content/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>About</title>
-      <link>http://omen-.github.io/about/</link>
-      <pubDate>Sun, 15 Oct 2017 00:53:47 +0200</pubDate>
-      
-      <guid>http://omen-.github.io/about/</guid>
-      <description>Hi there ! My name is Arthur Bellal, a Software Engineer curently located in Paris. I spend most of my free time building things or finding ways to break them apart.</description>
-    </item>
     
     <item>
       <title>Breaking dofus 1.29.1 maps encryption</title>
