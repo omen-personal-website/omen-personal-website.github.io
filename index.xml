@@ -17,7 +17,8 @@
       <pubDate>Sun, 15 Oct 2017 00:53:47 +0200</pubDate>
       
       <guid>http://arthur.bell.al/about/</guid>
-      <description>Hi there ! My name is Arthur Bellal, a Software Engineer curently located in Paris. I spend most of my free time building things or finding ways to break them apart.</description>
+      <description>Hi there ! My name is Arthur Bellal, a Software Engineer curently located in Paris.
+I spend most of my free time building things or finding ways to break them apart.</description>
     </item>
     
     <item>
@@ -27,7 +28,7 @@
       
       <guid>http://arthur.bell.al/blog/breaking-dofus-1.29.1-maps-encryption/</guid>
       <description>TL;DR
-A few years ago I found a way to retrieve unknown dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.
+A few years ago I found a way to retrieve unknown Dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.
 You can find an implementation of the attack described here on my github.
 Dofus  Dofus is a Flash-based tactical turn-oriented massively multiplayer online role-playing game (MMORPG) developed and published by Ankama Games, a French computer game manufacturer.</description>
     </item>

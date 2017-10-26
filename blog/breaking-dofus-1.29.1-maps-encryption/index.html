@@ -10,13 +10,13 @@
 <meta name="referrer" content="no-referrer">
 <meta name="author" content="Arthur Bellal">
 <meta name="description" content="TL;DR
-A few years ago I found a way to retrieve unknown dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.
+A few years ago I found a way to retrieve unknown Dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.
 You can find an implementation of the attack described here on my github.
 Dofus  Dofus is a Flash-based tactical turn-oriented massively multiplayer online role-playing game (MMORPG) developed and published by Ankama Games, a French computer game manufacturer.">
 
 <meta property="og:title" content="Breaking dofus 1.29.1 maps encryption" />
 <meta property="og:description" content="TL;DR
-A few years ago I found a way to retrieve unknown dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.
+A few years ago I found a way to retrieve unknown Dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.
 You can find an implementation of the attack described here on my github.
 Dofus  Dofus is a Flash-based tactical turn-oriented massively multiplayer online role-playing game (MMORPG) developed and published by Ankama Games, a French computer game manufacturer." />
 <meta property="og:type" content="article" />
@@ -162,7 +162,7 @@ Dofus  Dofus is a Flash-based tactical turn-oriented massively multiplayer onlin
 
 <p><strong>TL;DR</strong></p>
 
-<p>A few years ago I found a way to retrieve unknown dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.</p>
+<p>A few years ago I found a way to retrieve unknown Dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.</p>
 
 <p>You can find an implementation of the attack described here on my <a href="https://github.com/Omen-/dofus-key-finder">github</a>.</p>
 
@@ -176,7 +176,7 @@ Dofus  Dofus is a Flash-based tactical turn-oriented massively multiplayer onlin
 
 <p><a href="https://en.wikipedia.org/wiki/Dofus">Wikipedia - Dofus</a></p>
 
-<p>In 2010, Ankama Games reveal a major update of dofus, Dofus 2.0, with updated graphics and new content. This new version was not well received by the community and it resulted significant loss in the playerbase.</p>
+<p>In 2010, Ankama Games reveal a major update of Dofus, Dofus 2.0, with updated graphics and new content. This new version was not well received by the community and it resulted significant loss in the playerbase.</p>
 
 <p><img src="/images/dofus-maps/dofus2-4.png#center" alt="dofus" />
 <center><em>Dofus 1.29 / 2.0</em> - Copyright © 2017 Ankama Games</center></p>
@@ -189,9 +189,9 @@ Dofus  Dofus is a Flash-based tactical turn-oriented massively multiplayer onlin
 
 <p>When the player enters a map, the server sends him the decryption key. The game client uses this key to decrypt the map and then displays it.</p>
 
-<p>In order to obtain the key for a certain map, you need to be able to access this map. There is no way to cheat this system. If there was one it would also be a game-breaking bug that lets you teleport on any map.</p>
+<p>In order to get the key for a certain map, you need to access this map. There is no way to cheat this system. If there was one it would also be a game-breaking bug that lets you teleport on any map.</p>
 
-<p>If you send the wrong key to the client, the map will not be displayed properly.</p>
+<p>If you send the wrong key to the client, the map is not displayed properly.</p>
 
 <p><img src="/images/dofus-maps/bad-key.png#center" alt="bad key" />
 <center><em>Not quite correct key</em> - Copyright © 2017 Ankama Games</center></p>
@@ -218,7 +218,7 @@ Dofus  Dofus is a Flash-based tactical turn-oriented massively multiplayer onlin
 </span><span class="s1f40">  </span><span class="s3e8">return</span><span class="s1f40"> </span><span class="s7d0">decryptedData</span><span class="sfa0">;</span><span class="s1f40">
 </span><span class="s1f40"></span><span class="sfa0">}</span></code></pre>
 </div>
-<p>As you may be able to see, this is almost a standard <a href="https://en.wikipedia.org/wiki/XOR_cipher">XOR cipher</a> algorithm. The only difference is the parameter called <code>c</code> wich adds an offset to the key. This is probably an attempt to make the algorithm safer but nothing happens in practice. You do not need to understand why to continue with the rest of this post and can just ignore this but it only means that we will need to apply a <a href="https://en.wikipedia.org/wiki/Circular_shift">circular shift</a> on the key before sending it to the client.</p>
+<p>As you may be able to see, this is almost a standard <a href="https://en.wikipedia.org/wiki/XOR_cipher">XOR cipher</a> algorithm. The only difference is the parameter called <code>c</code> wich adds an offset to the key index. This is probably an attempt to make the algorithm safer but does nothing in practice. You do not need to understand why to continue with the rest of this post and can just ignore this but it only means that we will need to apply a <a href="https://en.wikipedia.org/wiki/Circular_shift">circular shift</a> on the key before sending it to the client.</p>
 
 <p><a href="https://en.wikipedia.org/wiki/XOR_cipher">XOR cipher</a> can be a strong encryption algorithm if the following conditions are met:</p>
 
@@ -244,7 +244,7 @@ Dofus  Dofus is a Flash-based tactical turn-oriented massively multiplayer onlin
 
 <h4 id="why-is-it-important">Why is it important ?</h4>
 
-<p><a href="https://en.wikipedia.org/wiki/Exclusive_or">XOR</a> has an intresting property that make <a href="https://en.wikipedia.org/wiki/XOR_cipher">XOR cipher</a> possible and XOR so usefull in computer science :</p>
+<p><a href="https://en.wikipedia.org/wiki/Exclusive_or">XOR</a> has an interesting property that make <a href="https://en.wikipedia.org/wiki/XOR_cipher">XOR cipher</a> possible and XOR so useful in computer science :</p>
 
 <pre><code>a == a ^ b ^ b
 &gt; true
@@ -260,7 +260,7 @@ xor1 ^ xor2 == a ^ b
 
 <hr />
 
-<p>Since the key length is lower than the data length, it means that during encryption each part (byte) of the key is going to be applied multiple time on the data.</p>
+<p>Since the key length is lower than the data length, it means that during encryption each part (byte) of the key is applied to multiple parts of the data.</p>
 
 <pre><code>encryptedData[0] = data[0] ^ key[0]
 encryptedData[keyLength] = data[keyLength] ^ key[0]
@@ -276,7 +276,7 @@ encryptedData[keyLength] = data[keyLength] ^ key[0]
 <li><code>key[0]</code> is <code>c</code></li>
 </ul>
 
-<p>Wich means :</p>
+<p>⇒</p>
 
 <pre><code>encryptedData[0] ^ encryptedData[keyLength] == data[0] ^ data[keyLength]
 &gt; true
@@ -289,7 +289,7 @@ data[x*keyLength + z] ^ data[y*keyLength + z]
 &gt; true
 </code></pre>
 
-<p>This tool is not usefull in itself, but if we can somehow estimate the possible values for <code>data[x*keyLength + z]</code> and <code>data[y*keyLength + z]</code>, we may be able to deduce their real values.</p>
+<p>This tool is not useful in itself, but if we can somehow estimate the possible values for <code>data[x*keyLength + z]</code> and <code>data[y*keyLength + z]</code>, we may be able to deduce their real values.</p>
 
 <p><strong>Example :</strong></p>
 
@@ -349,7 +349,7 @@ data[x*keyLength + z] ^ data[y*keyLength + z]
 166 ^ 10 = 172
 </code></pre>
 
-<p>To have a <code>data[0]</code> equal to <code>140</code> or to <code>166</code> we would need an invalid key. This proves that <code>data[0]</code> is not equal to any of thoses two values.</p>
+<p>To have a <code>data[0]</code> equal to <code>140</code> or to <code>166</code> we would need an invalid key. This proves that <code>data[0]</code> is not equal to any of those two values.</p>
 
 <p>⇒</p>
 
@@ -361,11 +361,11 @@ data[x*keyLength + z] ^ data[y*keyLength + z]
 
 <h3 id="3-the-data-cannot-be-guessed">3. The data cannot be guessed.</h3>
 
-<p>To answer this hypothesis, we need to understand the format of dofus maps data.</p>
+<p>To answer this hypothesis, we need to understand the format of Dofus maps data.</p>
 
-<p>The data is divided in chunks of 10 bytes that each represents one cell. Thoses ten bytes all have a specific role in describing the cell : they inform the game if the cell is walkable, what is it&rsquo;s texture, etc..</p>
+<p>The data is divided in chunks of 10 bytes that each represents one cell. Those ten bytes all have a specific role in describing the cell : they inform the game if the cell is walkable, what is it&rsquo;s texture, etc..</p>
 
-<p>Here is an example of the begining of a decrypted map data containing 7 cells :</p>
+<p>Here is an example of the beginning of a decrypted map data containing 7 cells :</p>
 
 <pre>
 <code><span style="color:   #a93226">HhfDaaaaaa</span><span style="color:   #9b59b6">HhfDeaaaaa</span><span style="color:#2980b9">HhfDeaaaaa</span><span style="color:#229954">HhfDeaazaa</span><span style="color:#f1c40f">HhfDeaazaa</span><span style="color:  #ba4a00">HhfDeaaaaa<span style="color: #34495e">HhfDeaaaaa</span></code>
@@ -373,18 +373,18 @@ data[x*keyLength + z] ^ data[y*keyLength + z]
 
 <p>It is easy to see that some bytes of the cells tend to have the same values. Here, the first byte is always <code>H</code>.</p>
 
-<p>Thoses observations led me to make statistics for each of theses 10 bytes.</p>
+<p>Those observations led me to make statistics for each of theses 10 bytes.</p>
 
 <p><img src="/images/dofus-maps/1bc-distribution.png#center" alt="first byte of cells distribution" />
 <center><em>Distribution of values for the first byte in cells</em></center></p>
 
-<p>As you can see, for the first byte, there are only 6 possibilites, with 3 of them appearing in less than 1% of the cases.</p>
+<p>As you can see, for the first byte, there are only 6 possibilities, with 3 of them appearing in less than 1% of the cases.</p>
 
 <p>I did the same for the remaining 9 bytes and the number of possibilities ranges from 10 to 63. If you want to take a look at the full statistics, you can do so <a href="/etc/cell_stats.json">here</a>.</p>
 
 <h4 id="why-is-it-important-2">Why is it important ?</h4>
 
-<p>We now have <a href="/etc/cell_stats.json">10 arrays</a> containing the possibles values for each byte of any cell. We will name the array containing these 10 arrays <code>possibleValuesForCellAtPosition[10][]</code></p>
+<p>We now have <a href="/etc/cell_stats.json">10 arrays</a> containing the possible values for each byte of any cell. We will name the array containing these 10 arrays <code>possibleValuesForCellAtPosition[10][]</code></p>
 
 <p>We could use this to build an array of possible values for each byte of the data of a map.</p>
 
@@ -397,7 +397,7 @@ data[x*keyLength + z] ^ data[y*keyLength + z]
 </div>
 <h2 id="building-the-attack">Building the attack</h2>
 
-<p>During our analysis of this XOR cipher implementation, we discovered 3 ways to narrow down the possible values for the decrypted data and therefore the key. The objective is now to merge all of this in an algorithm that will hopefully be able to reduces the possibles values for each part of the key to only one.</p>
+<p>During our analysis of this XOR cipher implementation, we discovered 3 ways to narrow down the possible values for the decrypted data and therefore the key. The objective is now to merge all of this in an algorithm that will hopefully be able to reduces the amount of possible values for each part of the key to only one.</p>
 
 <p>Here is my implementation at the highest level in pseudocode :</p>
 
@@ -456,13 +456,13 @@ data[x*keyLength + z] ^ data[y*keyLength + z]
 9: 99.421586 % on average
 </code></pre>
 
-<p>The results depends on the length of the key. This is due to the way method 1. works : the more diversity there is between the two arrays of possibilites we are trying to narrow, the better the result will be. If the keyLength % 10 = 0 we will always use method 1. with two bytes that correspond to the same cell. There will then be very little diversity in the two array of possibilities.</p>
+<p>The results depend on the length of the key. This is due to the way method 1. works : the more diversity between the two arrays of possibilities we are trying to narrow, the better the result will be. If the keyLength % 10 = 0 we will always use method 1. with two bytes that correspond to the same cell. There will then be very little diversity in the two array of possibilities.</p>
 
 <p>From there the best way to find the missing parts of the is to use a statistical approach.</p>
 
 <p>You can find an implementation of this attack on my <a href="https://github.com/Omen-/dofus-key-finder">github</a>.</p>
 
-<p>If you want more details on any part of this attack you can contact me, I will be more than happy to aswer !</p>
+<p>If you want more details on any part of this attack you can contact me, I will be more than happy to answer !</p>
 
                 <br>
 		<p><a href="/blog/">Back to posts</a></p>
